@@ -1,0 +1,105 @@
+function love.draw()
+  --draws the black border around the screen.
+  love.graphics.setColor(0, 0, 0)
+  love.graphics.rectangle("fill", 0, 0, 704, 576)
+  --draws the white rectangle in the middle and prints the text on the screen.
+  love.graphics.setColor(255, 255, 255)
+  love.graphics.rectangle("fill", 64, 64, 576, 448)
+  love.graphics.print(printvar)
+  --draws the player, a blue rectangle.
+  love.graphics.setColor(0, 0, 244)
+  love.graphics.rectangle("fill", player.x, player.y, 64, 64)
+end
+
+--checks which key is pressed when certain keys are pressed it performs certain actions,
+--uses WSAD for movement.
+function love.keypressed(key)
+  if key == "w" and move.up then
+    player.y = player.y - 64
+  elseif key == "s" and move.down then
+    player.y = player.y + 64
+  end
+  if key == "a" and move.left then
+    player.x = player.x - 64
+  elseif key == "d" and move.right then
+    player.x = player.x + 64
+  end
+end
+
+--resizes the window to x 704 and y 576.
+function window()
+  love.window.setMode(704, 576)
+end
+
+--draws our map, changing the numbers here will result in either a collision or not, it only checks for 0 so anything except for 0 is a collision.
+function sketch_wall()
+sketch = {}
+sketch[1] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+sketch[2] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+sketch[3] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+sketch[4] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+sketch[5] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+sketch[6] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+sketch[7] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+sketch[8] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+sketch[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+end
+
+--collision function; player.y / 64 + 1 and player.x / 64 + 1 is the current location on the map, see table above. so we define + 2 for if he goes right or 0 if left.
+function collision(sketch)
+  if sketch[player.y / 64 + 1][player.x / 64 + 2] == 0 then
+    move.right = true
+    move.rightnum = 0
+  else
+    move.right = false
+    move.rightnum = 1
+  end  
+  if sketch[player.y / 64 + 1][player.x / 64] == 0 then
+    move.left = true
+    move.leftnum = 0
+  else
+    move.left = false
+    move.leftnum = 1
+  end  
+  if sketch[player.y / 64][player.x / 64 + 1] == 0 then
+    move.up = true
+    move.upnum = 0
+  else
+    move.up = false
+    move.upnum = 1
+  end  
+  if sketch[player.y / 64 + 2][player.x / 64 + 1] == 0 then
+    move.down = true
+    move.downnum = 0
+  else
+    move.down = false
+    move.downnum = 1
+  end
+end
+
+function love.load()
+  --creates a table for the movement.
+  move = {}
+  move.up = true
+  move.down = true
+  move.left = true
+  move.right = true
+  move.upnum = 0
+  move.downnum = 0
+  move.leftnum = 0
+  move.rightnum = 0
+  --table for the player
+  player = {}
+  player.x = 64
+  player.y = 64
+  --calls the sketch_wall() function.
+  sketch_wall()
+  --calls the window() function.
+  window()
+end
+
+function love.update()
+  --prints the values of the numbers associated with left, right, up and down 0 means you can move to that spot but 1 means there would be a collision.
+  printvar = {"                                                        ", "Up: " .. move.upnum, "      ", "Down: " .. move.downnum, "      ", "Left: " .. move.leftnum, "      ",  "Right: " .. move.rightnum}
+  collision(sketch)
+end
